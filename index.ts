@@ -1,27 +1,37 @@
 class Car {
-  constructor(license, checkInTime) {
+  license: string;
+  checkInTime: Date;
+  feeCharged: number;
+  checkOutTime: Date | null;
+
+  constructor(license: string, checkInTime: Date) {
     this.license = license;
     this.checkInTime = checkInTime || new Date();
     this.feeCharged = 0;
     this.checkOutTime = null;
   }
 
-  checkOut(checkOutTime, rate) {
-    const hoursParked = (checkOutTime - this.checkInTime) / (1000 * 60 * 60);
+  checkOut(checkOutTime: Date, rate: number): void {
+    const hoursParked = (checkOutTime.getTime() - this.checkInTime.getTime()) / (1000 * 60 * 60);
     this.checkOutTime = checkOutTime;
     this.feeCharged = rate * hoursParked;
   }
 }
 
 class ParkingLot {
-  constructor(name, rate) {
+  name: string;
+  rate: number;
+  cars: Record<string, Car>;
+  totalRevenue: number;
+
+  constructor(name: string, rate: number) {
     this.name = name;
     this.rate = rate;
     this.cars = {};
     this.totalRevenue = 0;
   }
 
-  addCar(license, checkInTime) {
+  addCar(license: string, checkInTime: Date): boolean {
     if (this.cars[license]) {
       console.log('Car is already checked in.');
       return false;
@@ -32,7 +42,7 @@ class ParkingLot {
     return true;
   }
 
-  removeCar(license, checkOutTime) {
+  removeCar(license: string, checkOutTime: Date): boolean {
     const car = this.cars[license];
     if (!car) {
       console.log('Car is not checked in.');
@@ -47,11 +57,13 @@ class ParkingLot {
 }
 
 class ParkingGarageManagement {
+  parkingLots: Record<string, ParkingLot>;
+
   constructor() {
     this.parkingLots = {};
   }
 
-  addParkingLot(name, rate) {
+  addParkingLot(name: string, rate: number): boolean {
     if (this.parkingLots[name]) {
       console.log('Parking lot already exists.');
       return false;
@@ -60,7 +72,7 @@ class ParkingGarageManagement {
     return true;
   }
 
-  addCar(parkingLotName, license, checkInTime) {
+  addCar(parkingLotName: string, license: string, checkInTime: Date): boolean {
     const lot = this.parkingLots[parkingLotName];
     if (!lot) {
       console.log('Parking lot does not exist.');
@@ -69,7 +81,7 @@ class ParkingGarageManagement {
     return lot.addCar(license, checkInTime);
   }
 
-  removeCar(parkingLotName, license, checkOutTime) {
+  removeCar(parkingLotName: string, license: string, checkOutTime: Date): boolean {
     const lot = this.parkingLots[parkingLotName];
     if (!lot) {
       console.log('Parking lot does not exist.');
@@ -78,8 +90,8 @@ class ParkingGarageManagement {
     return lot.removeCar(license, checkOutTime);
   }
 
-  getHighestRevenueLot() {
-    let highestRevenueLot = null;
+  getHighestRevenueLot(): string | null {
+    let highestRevenueLot: ParkingLot | null = null;
     let maxRevenue = 0;
 
     for (const lot of Object.values(this.parkingLots)) {
